@@ -1,0 +1,13 @@
+# Build artifacts
+build/
+plugins/
+*.o
+*.dylib
+*.so
+
+# macOS
+.DS_Store
+
+# Editor
+*.swp
+*~

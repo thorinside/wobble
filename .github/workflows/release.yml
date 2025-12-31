@@ -1,0 +1,81 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+
+    - name: Install ARM toolchain
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi
+
+    - name: Install Faust
+      run: |
+        sudo apt-get install -y faust
+
+    - name: Extract version from tag
+      id: version
+      run: |
+        VERSION=${GITHUB_REF#refs/tags/v}
+        echo "version=$VERSION" >> $GITHUB_OUTPUT
+        echo "Building version: $VERSION"
+
+    - name: Update version in DSP
+      run: |
+        sed -i 's/declare version "[^"]*"/declare version "${{ steps.version.outputs.version }}"/' wobble.dsp
+        grep 'declare version' wobble.dsp
+
+    - name: Build ARM plugin
+      run: |
+        make hardware
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        name: Wobble v${{ steps.version.outputs.version }}
+        body: |
+          ## Wobble v${{ steps.version.outputs.version }}
+
+          Wobbly oscillator with organic movement for disting NT.
+
+          ### Features
+          - Sine oscillator with amplitude and phase wobble modulation
+          - V/Oct pitch tracking with octave and semitone tuning
+          - Audio-rate linear FM with CV-controllable depth
+          - Soft tube-style saturation for Eurorack-safe output levels
+
+          ### Parameters
+          - **Octave**: -2 to +4 octaves from C3 base
+          - **Tune**: ±7 semitones
+          - **FM Depth**: 0-8 with logarithmic response
+          - **Amp Wobble**: 0-500%
+          - **Phase Wobble**: 0-300%
+          - **Wobble Rate**: 0.1-200 Hz
+
+          ### Inputs
+          - Pitch CV (V/Oct)
+          - FM In (audio-rate)
+          - FM Depth CV
+          - Amp CV
+          - Phase CV
+          - Rate CV
+
+          ### Installation
+          Copy `wobble.o` to your disting NT's plugin folder.
+        files: |
+          plugins/wobble.o
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
