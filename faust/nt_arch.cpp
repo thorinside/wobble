@@ -144,6 +144,9 @@ struct dsp_memory_manager
 {
 	enum _mem { kMemClass, kMemInstance };
 
+    enum MemType { kInt32, kInt32_ptr, kFloat, kFloat_ptr, kDouble, kDouble_ptr, kQuad,
+        kQuad_ptr, kFixedPoint, kFixedPoint_ptr, kObj, kObj_ptr, kSound, kSound_ptr };
+
 	size_t	total;
 	bool 	first;
 	_mem	mode;
@@ -156,7 +159,7 @@ struct dsp_memory_manager
 		first = true;
 	}
 	void end() {}
-	void info(size_t size, size_t reads, size_t writes)
+	void info(const char* name, MemType type, size_t count, size_t size, size_t reads, size_t writes)
 	{
 		if ( mode == kMemClass )
 		{
