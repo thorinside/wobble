@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
     - name: Checkout
@@ -20,12 +20,11 @@ jobs:
 
     - name: Install ARM toolchain
       run: |
-        sudo apt-get update
-        sudo apt-get install -y gcc-arm-none-eabi
+        brew install arm-none-eabi-gcc
 
     - name: Install Faust
       run: |
-        sudo apt-get install -y faust
+        brew install faust
         faust --version
 
     - name: Extract version from tag
@@ -37,7 +36,7 @@ jobs:
 
     - name: Update version in DSP
       run: |
-        sed -i 's/declare version "[^"]*"/declare version "${{ steps.version.outputs.version }}"/' wobble.dsp
+        sed -i '' 's/declare version "[^"]*"/declare version "${{ steps.version.outputs.version }}"/' wobble.dsp
         grep 'declare version' wobble.dsp
 
     - name: Build ARM plugin
