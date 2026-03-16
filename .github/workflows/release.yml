@@ -20,7 +20,7 @@ jobs:
 
     - name: Install ARM toolchain
       run: |
-        brew install arm-none-eabi-gcc
+        brew install --cask gcc-arm-embedded
 
     - name: Install Faust
       run: |
