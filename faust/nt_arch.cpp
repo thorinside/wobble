@@ -180,6 +180,11 @@ struct dsp_memory_manager
 			total += size;
 		}
 	}
+	// Backward compatibility with older Faust versions that generate 3-arg info() calls
+	void info(size_t size, size_t reads, size_t writes)
+	{
+		info(nullptr, kInt32, 1, size, reads, writes);
+	}
 	void* allocate(size_t size)
 	{
 		size_t m = total;
